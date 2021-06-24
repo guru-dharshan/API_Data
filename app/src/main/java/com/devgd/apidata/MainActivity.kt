@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,19 +22,35 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
     private val movieList = ArrayList<ApiModelClass>()
     private lateinit var moviesAdapter: ApiAdapter
+    private lateinit var mainViewModel: ApiViewModel
     private var requestQueue: RequestQueue? = null
     var textView:TextView?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
-        moviesAdapter = ApiAdapter(movieList)
-        val layoutManager = LinearLayoutManager(applicationContext)
-        recyclerView.layoutManager = layoutManager
-            recyclerView.itemAnimator = DefaultItemAnimator()
-        recyclerView.adapter = moviesAdapter
+//        moviesAdapter = ApiAdapter(movieList)
+//        val layoutManager = LinearLayoutManager(applicationContext)
+//        recyclerView.layoutManager = layoutManager
+//            recyclerView.itemAnimator = DefaultItemAnimator()
+//        recyclerView.adapter = moviesAdapter
        // prepareMovieData()
         textView=findViewById(R.id.errorMessage)
+
+        mainViewModel = ViewModelProviders.of(
+            this,
+            ViewModelFactory(application)
+        ).get(ApiViewModel::class.java)
+
+        mainViewModel.getUsers().observe(this, Observer {
+           moviesAdapter= ApiAdapter(it)
+            val layoutManager = LinearLayoutManager(applicationContext)
+            recyclerView.layoutManager = layoutManager
+            recyclerView.itemAnimator = DefaultItemAnimator()
+            recyclerView.adapter = moviesAdapter
+
+        })
+
     }
 
 //    private fun prepareMovieData() {
